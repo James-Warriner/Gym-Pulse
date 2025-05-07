@@ -1,0 +1,72 @@
+{% extends "layout.html" %} {% block title %} Home {% endblock %} {% block main %}
+<h2 class="h2">History of {{user.first_name}}</h2>
+
+{% for workout in workouts %}
+<div class="container mt-4">
+  {% if workout.name %}
+  <h3>{{workout.name}}</h1>
+
+  {% else %}
+    <h3>Untitled Workout</h3>
+
+  {% endif %}
+  <p>Completed: {{workout.end_time}}</p>
+  <button id="{{workout.id}}" class="btn btn-outline-primary">View</button>
+  <button id={{workout.id}} class="btn btn-sm"><img class="img img-fluid" style="height:20%; width:20%;" src = "static/image.png"></button>
+</div>
+{% endfor %}
+
+
+<script>
+  
+  document.querySelectorAll(".btn.btn-sm").forEach(button => {
+  button.addEventListener('click', function () {
+    const workoutId = this.id;
+    console.log("Deleting workout:", workoutId);
+
+    fetch("/history", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "delete",
+        workoutId: workoutId
+      })
+    })
+    .then(response => response.text())
+    .then(html => {
+      document.open();
+      document.write(html);
+      document.close();
+    });
+  });
+});
+
+document.querySelectorAll(".btn.btn-outline-primary").forEach(button => {
+  button.addEventListener('click', function () {
+    const workoutId = this.id;
+    console.log("Deleting workout:", workoutId);
+
+    fetch("/history", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "view",
+        workoutId: workoutId
+      })
+    })
+    .then(response => response.text())
+    .then(html => {
+      document.open();
+      document.write(html);
+      document.close();
+    });
+  });
+});
+
+</script>
+
+{% endblock %}

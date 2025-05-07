@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %} Home {% endblock %}
+
+{% block main %}
+<a href="/history"><button class="btn btn-outline-danger">Back</button></a>
+<div class="container mt-5">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">Workout: {{ workout.name or "Untitled" }}</h2>
+    <p class="text-muted"><i class="bi bi-calendar-check"></i> Completed: {{ workout.end_time }}</p>
+    <p class="text-muted"><i class="bi bi-calendar-check"></i> Duration: {{ workout.duration_minutes }} minutes</p>
+  </div>
+
+  {% for exercise_name, sets in grouped_sets.items() %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ exercise_name }}</h5>
+        <span class="badge bg-light text-dark">{{ sets|length }} Set{{ 's' if sets|length > 1 }}</span>
+      </div>
+      <div class="card-body">
+        {% for s in sets %}
+          <div class="border rounded p-3 mb-3 bg-light">
+            <p class="mb-1"><strong>Weight:</strong> {{ s.weight }} kg</p>
+            <p class="mb-1"><strong>Reps:</strong> {{ s.reps }}</p>
+            {% if s.notes %}
+              <p class="mb-0 text-muted"><i class="bi bi-journal-text"></i> {{ s.notes }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,176 @@
+h2{
+  margin-top: 10%;
+}
+
+.mb-3{
+  margin-top: 10%;
+}
+
+.link{
+  margin-top:20%;
+  
+}
+
+.orange{
+  background-color: orange;
+}
+
+.mb2
+{
+  margin-top:50%;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+  padding: 20px;
+}
+
+
+h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+
+.form-control {
+  padding: 15px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+
+button[type="submit"] {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+
+button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+
+a.link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a.link:hover {
+  text-decoration: underline;
+}
+
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+
+@media (max-width: 576px) {
+  .form-control {
+      font-size: 0.9rem;
+      padding: 8px;
+  }
+
+  button[type="submit"] {
+      font-size: 0.9rem;
+  }
+
+  h2 {
+      font-size: 1.5rem;
+  }
+}
+
+
+.text-center {
+  text-align: center;
+}
+
+
+.mt-3 {
+  margin-top: 10px;
+}
+
+
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none;
+}
+
+
+.error-message {
+  color: #ff4d4d;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.row
+{
+  margin-top:2%;
+  margin-bottom: 2%;
+}
+
+#error-bar {
+  background-color: #f44336;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px auto;
+  max-width: 600px;
+}
+form button[type="submit"].btn-outline-primary {
+  background-color: transparent !important;
+  border-color: #0d6efd !important;
+  border-style: solid;
+  border-width: 1px;
+  color: #0d6efd !important;
+  width: 70%;
+  height:auto;
+}
+
+
+.form-container {
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+}
+
+
+#register_form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 50%;
+}
+
+button[type="submit"] {
+  margin-top: auto; 
+}
+
+

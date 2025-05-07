@@ -1,0 +1,58 @@
+<div id="main">
+  {% extends "layout.html" %} {% block title %} Home {% endblock %} {% block main %}
+
+<div class="container container-fluid mt-1">
+  <h2>Browse users</h2>
+  <table class="table table-striped table-bordered table-responsive ">
+    <th class="text-bg-primary">
+      Username
+    </th>
+    <th class="text-bg-primary">
+      Joined
+    </th>
+
+    {% for user in users %}
+    <tr>
+      <td>
+        {{user.username}}
+      </td>
+      <td>
+        {{user.timestamp}}
+      </td>
+      <td>
+        <button id={{user.id}} class="btn btn-outline-primary">View</button>
+      </td>
+      
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<script>
+
+  document.querySelectorAll(".btn.btn-outline-primary").forEach(button => {
+    button.addEventListener('click',async function(){
+      const userId = this.id;
+
+      const res = await fetch("/browse_profiles", {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({"id":userId})
+      });
+
+      const data = await res.json();
+
+      if (data.html){
+        document.getElementById('main').innerHTML = data.html;
+      }}
+      
+
+    )});
+  
+  
+</script>
+
+
+{% endblock %}</div>

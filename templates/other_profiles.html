@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block main %}
+<div class="container mt-4 mb-5">
+  <h2 class="mb-4 text-center text-primary-emphasis">{{ user.username }}'s Profile</h2>
+
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    <!-- Personal Info -->
+    <div class="col">
+      <div class="card border-primary shadow-sm">
+        <div class="card-header text-bg-primary text-white">Personal Info</div>
+        <div class="card-body">
+          <p class="mb-1 text-muted">Full Name</p>
+          <p class="fw-semibold">{{ user.first_name }} {{ user.last_name }}</p>
+
+          <p class="mb-1 text-muted">Joined</p>
+          <p class="fw-semibold">{{ user.timestamp }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gym Info -->
+    <div class="col">
+      <div class="card border-primary shadow-sm">
+        <div class="card-header text-bg-primary text-white">Gym</div>
+        <div class="card-body">
+          <p class="mb-1 text-muted">Affiliated Gym</p>
+          <p class="fw-semibold">{{ user.gym_name }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workout Stats -->
+    <div class="col">
+      <div class="card border-primary shadow-sm">
+        <div class="card-header text-bg-primary text-white">Workout Stats</div>
+        <div class="card-body">
+          <p class="mb-1 text-muted">Total Workouts</p>
+          <p class="fw-semibold">{{ user.count }}</p>
+
+          <p class="mb-1 text-muted">Total Time Spent</p>
+          <p class="fw-semibold">{{ user.total_duration }} minutes</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Favourite Exercise -->
+    <div class="col">
+      <div class="card border-primary shadow-sm">
+        <div class="card-header text-bg-primary text-white">Favourite Exercise</div>
+        <div class="card-body">
+          <p class="mb-1 text-muted">Most Used Exercise</p>
+          <p class="fw-semibold">{{ user.most_used_exercise }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

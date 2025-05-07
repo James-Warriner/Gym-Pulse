@@ -1,0 +1,119 @@
+{% extends "layout.html" %}
+
+{% block title %} Home {% endblock %}
+
+{% block main %}
+<h2 class="h2">Welcome home, {{ user.first_name }}</h2>
+
+<div class="container container-fluid">
+    <p class="p-md-4">
+        Feeling energetic?
+    </p>
+    <a href="/workout">
+        <button id="new_workout_btn" class="btn btn-outline-primary">
+            {% if activeWorkout %}
+            Continue workout
+            {% else %}
+            Start new workout
+            {% endif %}
+        </button>
+    </a>
+</div>
+
+<div class="container mt-4">
+    <p>Your stats</p>
+    <div class="row border-1">
+        <div class="col text-bg-primary text-center border-end">Workouts This Year</div>
+        <div class="col text-bg-primary text-center border-end">Favourite Exercise</div>
+        <div class="col text-bg-primary text-center">Hours spent</div>
+
+        <div class="w-100"></div>
+
+        <div class="col bg-success-subtle d-flex justify-content-center align-items-center border-end">{{ user.count }}</div>
+        <div class="col bg-success-subtle d-flex justify-content-center align-items-center border-end">{{ user.favourite }}</div>
+        <div class="col bg-success-subtle d-flex justify-content-center align-items-center">{{ user.duration }}</div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <p class="h5 text-center mb-3">{{ user.name }} Leaderboard</p>
+
+    <form action="/" method="post" class="mb-4">
+        <div class="row">
+            <!-- Filter dropdown -->
+            <div class="col-md-4">
+                <label for="filter_select" class="form-label">Filter By</label>
+                <select id="filter_select" name="filter_type" class="form-select" onchange="toggleUserSearchInput()">
+                    {% if filter_type == 'exercise' %}
+                        <option value="exercise" selected>Exercise Only</option>
+                        <option value="exercise_and_name">Exercise + User</option>
+                    {% else %}
+                        <option value="exercise">Exercise Only</option>
+                        <option value="exercise_and_name" selected>Exercise + User</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="exercise_select" class="form-label">Select Exercise</label>
+                <select id="exercise_select" name="exercise_id" class="form-select">
+                    {% for exercise in exercises %}
+                        {% if selected == exercise.id %}
+                            <option value="{{ exercise.id }}" selected>{{ exercise.name }}</option>
+                        {% else %}
+                            <option value="{{ exercise.id }}">{{ exercise.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- User search field -->
+            <div class="col-md-4" id="user_search_input" {% if filter_type != 'exercise_and_name' %}style="display: none;"{% endif %}>
+                <label for="name" class="form-label">Search for User</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter full or partial name" value="{{ name }}">
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <button type="submit" class="btn btn-outline-primary" style="background-color: transparent;">Show Leaderboard</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead>
+                <tr>
+                    <th class="table text-bg-primary">Rank</th>
+                    <th class="table text-bg-primary">Username</th>
+                    <th class="table text-bg-primary">Exercise</th>
+                    <th class="table text-bg-primary">Weight</th>
+                    <th class="table text-bg-primary">Reps</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leader in leaderboard %}
+                <tr>
+                    <td>{{ leader.rank }}</td>
+                    <td>{{ leader.username }}</td>
+                    <td>{{ leader.name }}</td>
+                    <td>{{ leader.weight }}</td>
+                    <td>{{ leader.reps }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function toggleUserSearchInput() {
+        const filter = document.getElementById("filter_select").value;
+        const input = document.getElementById("user_search_input");
+        input.style.display = (filter === "exercise_and_name") ? "block" : "none";
+    }
+
+    document.addEventListener("DOMContentLoaded", toggleUserSearchInput);
+</script>
+
+{% endblock %}

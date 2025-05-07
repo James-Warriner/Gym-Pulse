@@ -1,0 +1,124 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+
+<div class="container-fluid d-flex flex-column" style="height: 100vh;">
+    <div class="row">
+
+        <div class="col-12 col-md-6 offset-md-3 mt-0">
+            <h2 class="text-center">Register</h2>
+            
+
+            <form action="/register" method="post" id="register_form" class="form-container">
+                <div class="mb-3">
+                    <input autocomplete="off" id="username_input" class="form-control" name="username" placeholder="Username" type="text" required>
+                </div>
+
+                <div class="mb-3">
+                    <input autocomplete="off" class="form-control" name="first_name" placeholder="First Name" type="text" required>
+                </div>
+
+                <div class="mb-3">
+                    <input autocomplete="off" class="form-control" name="last_name" placeholder="Last Name" type="text" required>
+                </div>
+
+                <div class="mb-3">
+                    <input autocomplete="off" class="form-control" name="email" placeholder="Email" type="email" required>
+                </div>
+
+                <div class="mb-3">
+                    <p>Date of Birth</p>
+                    <div class="row">
+                        <div class="col-4">
+                            <input type="text" class="form-control" name="dob_day" placeholder="Day (dd)" maxlength="2" required>
+                        </div>
+                        <div class="col-4">
+                            <input type="text" class="form-control" name="dob_month" placeholder="Month (mm)" maxlength="2" required>
+                        </div>
+                        <div class="col-4">
+                            <input type="text" class="form-control" name="dob_year" placeholder="Year (yyyy)" maxlength="4" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="gym_select" class="form-label">Select Gym</label>
+                    <select id="gym_select" name="gym_id" class="form-select">
+                        <option value="">Select Gym</option>
+                        {% for gym in gyms %}
+                            <option value="{{ gym.id }}">{{ gym.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <input class="form-control" name="password" placeholder="Password" type="password" required>
+                </div>
+            </form>
+            
+
+            <div class="text-center">
+                <button class="btn btn-outline-primary mt-3" type="submit" form="register_form">Register</button>
+            </div>
+            
+            <!-- Login link -->
+            <div class="text-center mt-3">
+                <a class="link" href="/login">Been here before? Log in here</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("username_input").addEventListener("change", async function(e) {
+    const username = e.target.value;
+
+    const res = await fetch("/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username: username })
+    });
+
+    const data = await res.json();
+
+    const errorBar = document.getElementById("error-bar");
+
+    if (data.message) {
+        errorBar.textContent = data.message;
+        errorBar.classList.remove("d-none");
+    } else {
+        errorBar.classList.add("d-none");
+    }
+});
+
+document.getElementById("register_form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    const res = await fetch("/register", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+
+    const errorBar = document.getElementById("error-bar");
+
+    if (data.message) {
+        errorBar.textContent = data.message;
+        errorBar.classList.remove("d-none");
+    } else if (data.redirect) {
+        window.location.href = data.redirect;
+    } else {
+        errorBar.classList.add("d-none");
+    }
+});
+</script>
+
+{% endblock %}

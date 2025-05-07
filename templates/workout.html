@@ -1,0 +1,315 @@
+{% extends "layout.html" %}
+{% block title %}Workout{% endblock %}
+
+
+{% block main %}
+
+<div class="container py-3">
+<input id="nameWorkout" type="text" class="input-group-text" placeholder="Title"/>
+    <h5 class="text-muted mb-3 text-center">Workout Started: {{ time }}</h5>
+
+    <div id="sets-container" class="mt-3"></div>
+
+    <button id="new-exercise-btn" class="btn btn-outline-primary btn-lg w-100 my-3">
+        <i class="bi bi-plus-circle me-1"></i> Add Exercise
+    </button>
+
+    <div id="exercise-dropdown" class="card shadow-sm mb-3" style="display: none;">
+        <div class="card-body">
+            <input type="text" id="exercise-search" class="form-control form-control-lg mb-3"
+                placeholder="Search exercises...">
+            <ul id="exercise-list" class="list-group" style="max-height: 200px; overflow-y: auto;"></ul>
+            <button id="add-exercise-btn" class="btn btn-outline-success btn-lg mt-3 w-100">
+                <i class="bi bi-check-circle me-1"></i> Confirm Selection
+            </button>
+        </div>
+    </div>
+
+    <button id="finish-workout-btn" class="btn btn-outline-success btn-lg mt-4 w-100">
+        <i class="bi bi-check-circle me-1"></i> Finish Workout
+    </button>
+
+</div>
+
+<style>
+    .set-row .card-body {
+        padding: 1rem;
+    }
+
+    .remove-exercise,
+    .remove-set {
+        font-size: 0.9rem;
+    }
+
+    .exercise-container {
+        border-left: 4px solid #0d6efd;
+        background-color: #f8f9fa;
+    }
+
+    .add-set-btn {
+        background-color: transparent;
+        border: 2px dashed #6c757d;
+        color: #6c757d;
+    }
+
+    .add-set-btn:hover {
+        background-color: #e2e6ea;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+    }
+
+    textarea.notes {
+        resize: vertical;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const setsContainer = document.getElementById('sets-container');
+        const newExerciseBtn = document.getElementById('new-exercise-btn');
+        const exerciseDropdown = document.getElementById('exercise-dropdown');
+        const exerciseSearch = document.getElementById('exercise-search');
+        const exerciseList = document.getElementById('exercise-list');
+        const addExerciseBtn = document.getElementById('add-exercise-btn');
+        const finishWorkoutBtn = document.getElementById('finish-workout-btn');
+        const nameWorkoutInput = document.getElementById("nameWorkout");
+
+
+
+        let workoutId = 0;
+        let selectedExerciseId = null;
+        let selectedExerciseName = null;
+        let exerciseContainers = {};
+
+        
+
+        fetch('/api/workout_id')
+            .then(res => res.json())
+            .then(data => {
+                workoutId = data.workout_id;
+                loadExistingSets();
+                getTitle();
+            });
+
+        newExerciseBtn.addEventListener('click', () => {
+            newExerciseBtn.style.display = 'none';
+            exerciseDropdown.style.display = 'block';
+            exerciseSearch.value = '';
+            exerciseList.innerHTML = '';
+        });
+
+        addExerciseBtn.addEventListener('click', () => {
+            if (!selectedExerciseId) {
+                alert('Please select an exercise.');
+                return;
+            }
+
+            if (exerciseContainers[selectedExerciseId]) {
+                alert('This exercise has already been added.');
+                return;
+            }
+
+            addExerciseContainer(selectedExerciseId, selectedExerciseName);
+            selectedExerciseId = null;
+            selectedExerciseName = null;
+            exerciseDropdown.style.display = 'none';
+            newExerciseBtn.style.display = 'block';
+        });
+
+        finishWorkoutBtn.addEventListener('click', async () => {
+            const res = await fetch('/workout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: workoutId, action: 'finish' })
+            });
+            const data = await res.json();
+            if (data.success) window.location.href = '/';
+        });
+
+        exerciseSearch.addEventListener('input', () => {
+            const query = exerciseSearch.value;
+            if (query.length < 3) return;
+            fetch('/q', {
+                method: 'POST',
+                body: new URLSearchParams({ query }),
+            }).then(res => res.json()).then(data => {
+                exerciseList.innerHTML = '';
+                data.forEach(exercise => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    li.textContent = exercise.name;
+                    li.dataset.exerciseId = exercise.id;
+
+                    const selectBtn = document.createElement('button');
+                    selectBtn.className = 'btn btn-outline-primary btn-sm';
+                    selectBtn.innerHTML = '<i class="bi bi-plus-circle"></i> Select';
+                    selectBtn.addEventListener('click', () => {
+                        selectedExerciseId = exercise.id;
+                        selectedExerciseName = exercise.name;
+                        exerciseSearch.value = exercise.name;
+                    });
+
+                    li.appendChild(selectBtn);
+                    exerciseList.appendChild(li);
+                });
+            });
+        });
+
+        function addExerciseContainer(exerciseId, exerciseName, sets = []) {
+            const container = document.createElement('div');
+            container.className = 'exercise-container card mb-3';
+            container.innerHTML = `
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>${exerciseName}</strong>
+                    <button class="btn btn-outline-danger btn-sm remove-exercise"><i class="bi bi-trash"></i> Remove</button>
+                </div>
+                <div class="card-body">
+                    <div class="sets-list" id="sets-${exerciseId}"></div>
+                    <button class="btn add-set-btn mt-3 w-100" data-exercise-id="${exerciseId}">
+                        <i class="bi bi-plus"></i> Add Set
+                    </button>
+                </div>
+            `;
+            setsContainer.appendChild(container);
+            exerciseContainers[exerciseId] = true;
+
+            container.querySelector('.remove-exercise').addEventListener('click', () => {
+                container.remove();
+                delete exerciseContainers[exerciseId];
+                fetch('/delete_workout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: workoutId,
+                        exercise_name: exerciseName,
+                        table: 'all'
+                    })
+                });
+            });
+
+            container.querySelector('.add-set-btn').addEventListener('click', () => {
+                addSetToExercise(exerciseId);
+            });
+
+            sets.forEach(set => addSetToExercise(exerciseId, set));
+        }
+
+        function addSetToExercise(exerciseId, set = null) {
+            const setsList = document.getElementById(`sets-${exerciseId}`);
+            const setRow = document.createElement('div');
+            const setNumber = setsList.children.length + 1;
+            setRow.className = 'set-row card mb-2';
+
+            setRow.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center">
+                        <div class="me-2">Set #${setNumber}</div>
+                        <input type="number" class="form-control form-control-sm weight me-2" placeholder="Weight (kg)" value="${set?.weight || ''}">
+                        <input type="number" class="form-control form-control-sm reps me-2" placeholder="Reps" value="${set?.reps || ''}">
+                        
+                    </div>
+                    <textarea class="form-control notes mt-2" placeholder="Notes...">${set?.notes || ''}</textarea>
+                </div>
+            `;
+            setsList.appendChild(setRow);
+
+           
+
+            const inputs = setRow.querySelectorAll('input, textarea');
+            inputs.forEach(input => input.addEventListener('change', () => {
+                saveSet(exerciseId, setRow, setNumber);
+            }));
+        }
+        function updateTitle() {
+        const name = nameWorkoutInput.value;
+        console.log("updateTitle called with:", name);  
+
+        if (!workoutId || workoutId === 0) {
+            console.warn("Workout ID not yet loaded");
+            return;
+        }
+
+        fetch('/workout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'save_name',
+                workout_id: workoutId,
+                name: name
+            })
+        })
+        .then(res => res.json())
+        .then(data => console.log('Saved:', data));
+    }
+
+
+    nameWorkoutInput.addEventListener('input', updateTitle);
+
+    function getTitle() {
+
+
+        if (!workoutId || workoutId === 0) {
+            console.warn("Workout ID not yet loaded");
+            return;
+        }
+
+        fetch('/workout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'get_name',
+                workout_id: workoutId,
+            })
+        })
+        .then(res => res.json())
+        .then(data => nameWorkoutInput.value = data.name);
+    }
+
+
+
+        function saveSet(exerciseId, setRow, setNumber) {
+            const reps = setRow.querySelector('.reps').value;
+            const weight = setRow.querySelector('.weight').value;
+            const notes = setRow.querySelector('.notes').value;
+
+            if (!reps) return;
+
+            fetch('/workout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'save_set',
+                    exercise_id: exerciseId,
+                    set_number: setNumber,
+                    reps,
+                    weight,
+                    notes
+                })
+            }).then(res => res.json())
+              .then(data => console.log('Saved:', data));
+        }
+
+        function loadExistingSets() {
+            fetch(`/api/workouts/${workoutId}/sets`)
+                .then(res => res.json())
+                .then(sets => {
+                    const grouped = {};
+                    sets.forEach(s => {
+                        if (!grouped[s.exercise_id]) {
+                            grouped[s.exercise_id] = {
+                                name: s.exercise_name,
+                                sets: []
+                            };
+                        }
+                        grouped[s.exercise_id].sets.push(s);
+                    });
+                    Object.entries(grouped).forEach(([id, { name, sets }]) => {
+                        addExerciseContainer(id, name, sets);
+                    });
+                });
+        }
+    });
+</script>
+{% endblock %}

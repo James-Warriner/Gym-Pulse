@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block main %}
+
+
+    <h2 class="text-center">Login</h2>
+    <form id="login_form" action="/login" method="post">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-12">
+                    <input autocomplete="off" class="form-control" name="username" placeholder="Username" type="text">
+                </div>
+            </div>
+        </div>
+        
+        <div class="container mt-3">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-12">
+                    <input autocomplete="off" class="form-control" name="password" placeholder="Password" type="password">
+                </div>
+            </div>
+        </div>
+
+ 
+
+        <div class="container text-center mt-3">
+            <button class="btn btn-outline-primary mt-3" type="submit">Login</button>
+        </div>
+    </form>
+
+    <div class="container text-center mt-3">
+        <a class="link" href="./register">No account? No problem. Register here</a>
+    </div>
+    <script>
+        document.getElementById("login_form").addEventListener("submit", async function(e){
+            e.preventDefault()
+            const formData = new FormData(this);
+
+            const res = await fetch("/login",{
+                method:"POST",
+                body:formData
+            });
+
+            const data = await res.json();
+
+            if (data.message){
+                const errorBar = document.getElementById("error-bar");
+                errorBar.textContent = data.message;
+                errorBar.classList.remove("d-none")
+                
+            }
+             else if (data.redirect) {
+                    window.location.href = data.redirect;
+            }
+
+        });
+    </script>
+{% endblock %}
