@@ -1,0 +1,38 @@
+Date : 2025-05-09 15:05:54
+Directory : c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse
+Total : 10 files,  356 codes, 0 comments, 113 blanks, all 469 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| HTML     |          7 |        256 |          0 |         71 |        327 |
+| Python   |          2 |         94 |          0 |         42 |        136 |
+| Database |          1 |          6 |          0 |          0 |          6 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                  | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                     |         10 |        356 |          0 |        113 |        469 |
+| . (Files)                                                                             |          3 |        100 |          0 |         42 |        142 |
+| templates                                                                             |          7 |        256 |          0 |         71 |        327 |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                              | language | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\app.py                             | Python   |         90 |          0 |         40 |        130 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\gym.db                             | Database |          6 |          0 |          0 |          6 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\helpers.py                         | Python   |          4 |          0 |          2 |          6 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\admin.html               | HTML     |         30 |          0 |         11 |         41 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\admin_add_workout.html   | HTML     |         79 |          0 |         14 |         93 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\admin_edit_exercise.html | HTML     |         51 |          0 |         16 |         67 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\admin_edit_gyms.html     | HTML     |         24 |          0 |         13 |         37 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\admin_view_gyms.html     | HTML     |         67 |          0 |         17 |         84 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\index.html               | HTML     |          2 |          0 |          0 |          2 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\layout.html              | HTML     |          3 |          0 |          0 |          3 |
+| Total                                                                                 |          |        356 |          0 |        113 |        469 |
++---------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

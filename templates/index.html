@@ -1,3 +1,4 @@
+<div id="main">
 {% extends "layout.html" %}
 
 {% block title %} Home {% endblock %}
@@ -40,7 +41,7 @@
 
     <form action="/" method="post" class="mb-4">
         <div class="row">
-            <!-- Filter dropdown -->
+
             <div class="col-md-4">
                 <label for="filter_select" class="form-label">Filter By</label>
                 <select id="filter_select" name="filter_type" class="form-select" onchange="toggleUserSearchInput()">
@@ -89,16 +90,18 @@
                     <th class="table text-bg-primary">Exercise</th>
                     <th class="table text-bg-primary">Weight</th>
                     <th class="table text-bg-primary">Reps</th>
+                    <th class="table text-bg-success">Est 1RM</th>
                 </tr>
             </thead>
             <tbody>
                 {% for leader in leaderboard %}
                 <tr>
                     <td>{{ leader.rank }}</td>
-                    <td>{{ leader.username }}</td>
+                    <td><button id="{{leader.id}}" class="btn btn-outline-primary">@{{ leader.username }}</button></td>
                     <td>{{ leader.name }}</td>
                     <td>{{ leader.weight }}</td>
                     <td>{{ leader.reps }}</td>
+                    <td>{{leader.estimated_1RM}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -114,6 +117,31 @@
     }
 
     document.addEventListener("DOMContentLoaded", toggleUserSearchInput);
+
+    document.querySelectorAll(".btn.btn-outline-primary").forEach(button => {button.addEventListener('click', async function(){
+        const id = this.id;
+        console.log(id)
+        const res = await fetch("/browse_profiles", {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({id})
+        });
+
+        const data = await res.json();
+
+        if (data.html){
+            document.querySelector("#main").innerHTML = data.html;
+        }
+        else{
+            errorBar = document.getElementById("error-bar");
+            errorBar.innerHTML = data.message;
+            errorBar.classList.remove("d-none")
+        }
+    });
+});
 </script>
 
 {% endblock %}
+</div>

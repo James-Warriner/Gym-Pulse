@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %} Home {% endblock %}
+
+{% block main %}
+<div id="main">
+  <div class="container form-container">
+    <form class="levelForm" action="/admin_gyms" method="post">
+      
+      
+      <div class="container mt-2">
+        <p>Name</p>
+        <input class="form-control input-group-lg" name="name" type="text" value="{{ gym.name or '' }}"/>
+      </div>
+
+      
+      
+
+      
+      <div class="container mt-2">
+        <p>Postcode</p>
+        <input value="{{ gym.location or '' }}" class="form-control input-group-lg" name="location">
+      </div>
+
+      
+      <div class="container container-fluid mt-2">
+        <button type="submit" class="btn btn-outline-primary">Save</button>
+        <a href="/admin_gyms">
+          <button type="button" id="back_btn" class="btn btn-outline-danger">Back</button>
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

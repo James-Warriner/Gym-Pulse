@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %} Home {% endblock %}
+
+{% block main %}
+<div id="main">
+  <div class="container form-container">
+    <form class="levelForm" action="/admin_exercises" method="post">
+      
+      
+      <div class="container mt-2">
+        <p>Name</p>
+        <input class="form-control input-group-lg" name="name" type="text" value="{{ exercise.name or '' }}"/>
+      </div>
+
+      
+      <div class="container mt-2">
+        <p>Primary Muscle</p>
+        <select class="form-select" name="primary">
+          <option value="" disabled {% if not exercise or not exercise.m1name %}selected{% endif %}>-- Select Primary Muscle --</option>
+          {% for muscle in muscles %}
+            <option value="{{ muscle.id }}" {% if muscle.muscle_name == exercise.m1name %}selected{% endif %}>{{ muscle.muscle_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      
+      <div class="container mt-2">
+        <p>Secondary Muscle</p>
+        <select class="form-select" name="secondary">
+          <option value="None" {% if not exercise or exercise.m2name is none %}selected{% endif %}>None</option>
+          {% for muscle in muscles %}
+            <option value="{{ muscle.id }}" {% if muscle.muscle_name == exercise.m2name %}selected{% endif %}>{{ muscle.muscle_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      
+      <div class="container mt-2">
+        <p>Level</p>
+        <select class="form-select" name="level">
+          <option value="" disabled {% if not exercise or not exercise.level %}selected{% endif %}>-- Select Level --</option>
+          <option value="Beginner" {% if exercise.level == 'Beginner' %}selected{% endif %}>Beginner</option>
+          <option value="Intermediate" {% if exercise.level == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+          <option value="Advanced" {% if exercise.level == 'Advanced' %}selected{% endif %}>Advanced</option>
+        </select>
+      </div>
+
+      
+      <div class="container mt-2">
+        <p>Instructions</p>
+        <textarea class="form-control" name="instructions">{{ exercise.instructions or '' }}</textarea>
+      </div>
+
+      
+      <div class="container container-fluid mt-2">
+        <button type="submit" class="btn btn-outline-primary">Save</button>
+        <a href="/admin_exercises">
+          <button type="button" id="back_btn" class="btn btn-outline-danger">Back</button>
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

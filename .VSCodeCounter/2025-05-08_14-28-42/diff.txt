@@ -1,0 +1,44 @@
+Date : 2025-05-08 14:28:42
+Directory : c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse
+Total : 13 files,  348 codes, -13 comments, 113 blanks, all 448 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| HTML             |          8 |        183 |          2 |         35 |        220 |
+| Python           |          2 |        145 |         -2 |         59 |        202 |
+| CSS              |          1 |         22 |        -13 |         19 |         28 |
+| pip requirements |          1 |          2 |          0 |          0 |          2 |
+| Database         |          1 |         -4 |          0 |          0 |         -4 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                              | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                 |         13 |        348 |        -13 |        113 |        448 |
+| . (Files)                                                                         |          4 |        143 |         -2 |         59 |        200 |
+| static                                                                            |          1 |         22 |        -13 |         19 |         28 |
+| templates                                                                         |          8 |        183 |          2 |         35 |        220 |
++-----------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                                                          | language         | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\app.py                         | Python           |         56 |         -2 |         32 |         86 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\gym.db                         | Database         |         -4 |          0 |          0 |         -4 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\helpers.py                     | Python           |         89 |          0 |         27 |        116 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\requirements.txt               | pip requirements |          2 |          0 |          0 |          2 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\static\styles.css              | CSS              |         22 |        -13 |         19 |         28 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\browse_profiles.html | HTML             |         44 |          0 |         14 |         58 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\index.html           | HTML             |         67 |          0 |          5 |         72 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\layout.html          | HTML             |         -1 |          0 |          1 |          0 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\login.html           | HTML             |          4 |          0 |          2 |          6 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\other_profiles.html  | HTML             |         49 |          4 |          8 |         61 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\profile.html         | HTML             |         25 |          0 |          6 |         31 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\register.html        | HTML             |         -4 |         -2 |         -2 |         -8 |
+| c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\workout.html         | HTML             |         -1 |          0 |          1 |          0 |
+| Total                                                                             |                  |        348 |        -13 |        113 |        448 |
++-----------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+

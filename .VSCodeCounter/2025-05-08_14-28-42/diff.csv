@@ -1,0 +1,15 @@
+"filename", "language", "Database", "Python", "HTML", "CSS", "pip requirements", "comment", "blank", "total"
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\app.py", "Python", 0, 56, 0, 0, 0, -2, 32, 86
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\gym.db", "Database", -4, 0, 0, 0, 0, 0, 0, -4
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\helpers.py", "Python", 0, 89, 0, 0, 0, 0, 27, 116
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\requirements.txt", "pip requirements", 0, 0, 0, 0, 2, 0, 0, 2
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\static\styles.css", "CSS", 0, 0, 0, 22, 0, -13, 19, 28
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\browse_profiles.html", "HTML", 0, 0, 44, 0, 0, 0, 14, 58
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\index.html", "HTML", 0, 0, 67, 0, 0, 0, 5, 72
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\layout.html", "HTML", 0, 0, -1, 0, 0, 0, 1, 0
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\login.html", "HTML", 0, 0, 4, 0, 0, 0, 2, 6
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\other_profiles.html", "HTML", 0, 0, 49, 0, 0, 4, 8, 61
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\profile.html", "HTML", 0, 0, 25, 0, 0, 0, 6, 31
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\register.html", "HTML", 0, 0, -4, 0, 0, -2, -2, -8
+"c:\Users\James.Warriner\Documents\GitHub\Gym-Pulse\templates\workout.html", "HTML", 0, 0, -1, 0, 0, 0, 1, 0
+"Total", "-", -4, 145, 183, 22, 2, -13, 113, 448

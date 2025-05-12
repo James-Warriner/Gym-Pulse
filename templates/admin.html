@@ -1,0 +1,41 @@
+<div id="main">
+  {% extends "layout.html" %}
+  
+  {% block title %} Home {% endblock %}
+  
+  {% block main %}
+  <h2 class="h2">Welcome home, admin</h2>
+  
+  <div class="container container-fluid">
+      <p class="p-md-4">
+          Exercise management
+      </p>
+      <a href="/admin_exercises">
+          <button id="add_exercises" class="btn btn-outline-primary">
+              Enter
+          </button>
+      </a>
+  </div>
+
+  <div class="container container-fluid mt-4">
+    <p class="p-md-4">
+        Gym management
+    </p>
+    <a href="/admin_gyms">
+        <button id="add_gym" class="btn btn-outline-primary">
+            Enter
+        </button>
+    </a>
+</div>
+
+
+  
+  
+  </div>
+  
+  <script>
+     
+  </script>
+  
+  {% endblock %}
+  </div>

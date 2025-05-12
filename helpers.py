@@ -22,6 +22,14 @@ def login_required(f):
     return f(*args, **kwargs)
   return decorated_function
 
+def admin_required(f):
+  @wraps(f)
+  def decorated_function(*args, **kwargs):
+    if session.get("is_admin") is not True:
+      return redirect("/")
+    return f(*args, **kwargs)
+  return decorated_function
+
 def error(message, status):
   return jsonify({"message":message}),status
 
@@ -65,13 +73,18 @@ def loadUser():
 
 
       
-  cursor = db.execute("SELECT exercises.name, COUNT(*) AS count FROM sets JOIN exercises ON sets.exercise_id = exercises.id JOIN workouts ON workouts.id = sets.workout_id WHERE workouts.user_id = ? ORDER BY count DESC",(session["user_id"],))
+  cursor = db.execute("SELECT exercises.name, COUNT(*) AS count FROM sets JOIN exercises ON sets.exercise_id = exercises.id JOIN workouts ON workouts.id = sets.workout_id WHERE workouts.user_id = ? GROUP BY exercises.name ORDER BY count DESC",(session["user_id"],))
   rows = cursor.fetchall()
-
-  user["favourite"] = rows[0]["name"]
+  if rows:
+    user["favourite"] = rows[0]["name"]
       
-  user["count"] = count
-  user["duration"] = round(duration_counter/60,1)
+    user["count"] = count
+    user["duration"] = round(duration_counter/60,1)
+  else:
+    user["favourite"] = ""
+      
+    user["count"] = 0
+    user["duration"] = 0
   print(user)
 
   return user
@@ -84,60 +97,77 @@ def loadExercises():
 def loadLeaderboard(query):
     db = get_db()
     leaderboard = []
-    gym_id = db.execute("SELECT gym_id FROM users WHERE id = ? ",(session["user_id"],)).fetchall()[0]["gym_id"]
-    print(gym_id)
-    
+    gym_id = db.execute("SELECT gym_id FROM users WHERE id = ?", (session["user_id"],)).fetchone()["gym_id"]
+
     try:
         exercise_id = query.get("exercise_id")
         name_filter = query.get("name")
-        
-        if exercise_id and not name_filter:
-            leaderboard = db.execute("""
-                SELECT 
-                    RANK() OVER (ORDER BY sets.weight DESC) AS rank,
-                    exercises.name, 
-                    sets.weight, 
-                    users.username, 
-                    sets.reps
+
+        if exercise_id:
+
+            complete_leaderboard_sql = """
+            WITH UserBestSets AS (
+                SELECT
+                    users.id,
+                    exercises.name,
+                    sets.weight,
+                    sets.reps,
+                    ROUND(sets.weight * (1 + sets.reps / 30.0), 2) AS estimated_1RM,
+                    users.username,
+                    users.first_name,
+                    users.last_name,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY users.id 
+                        ORDER BY sets.weight * (1 + sets.reps / 30.0) DESC
+                    ) AS set_rank
                 FROM sets
                 JOIN exercises ON sets.exercise_id = exercises.id
                 JOIN workouts ON sets.workout_id = workouts.id
                 JOIN users ON workouts.user_id = users.id
                 WHERE exercises.id = ? AND users.gym_id = ?
-                ORDER BY sets.weight DESC
-                LIMIT 10
-            """, (exercise_id,gym_id)).fetchall()
-        
-        elif exercise_id and name_filter:
-            name = name_filter + '%'
-            print(name)
-            print(exercise_id)
-            leaderboard = db.execute("""
-                SELECT * FROM (
-                    SELECT 
-                        RANK() OVER (ORDER BY sets.weight DESC) AS rank,
-                        exercises.name, 
-                        sets.weight, 
-                        users.username,
-                        users.first_name,
-                        users.last_name, 
-                        users.gym
-                        sets.reps
-                    FROM sets
-                    JOIN exercises ON sets.exercise_id = exercises.id
-                    JOIN workouts ON sets.workout_id = workouts.id
-                    JOIN users ON workouts.user_id = users.id
-                    WHERE exercises.id = ? AND users.gym_id = ?
-                )
-                WHERE (first_name || ' ' || last_name) LIKE ? OR username LIKE ? AND 
-                ORDER BY rank
-            """, (exercise_id, name,name,gym_id)).fetchall()
+            )
+            SELECT
+                RANK() OVER (ORDER BY estimated_1RM DESC) AS rank,
+                id,
+                username,
+                name,
+                weight,
+                reps,
+                estimated_1RM,
+                first_name,
+                last_name
+            FROM UserBestSets
+            WHERE set_rank = 1
+            ORDER BY rank ASC
+            """
+            
+
+            complete_leaderboard = db.execute(complete_leaderboard_sql, (exercise_id, gym_id)).fetchall()
+            
+
+            if name_filter:
+
+                filtered_leaderboard = []
+                name_lower = name_filter.lower()
+                
+                for entry in complete_leaderboard:
+                    full_name = f"{entry['first_name']} {entry['last_name']}".lower()
+                    username = entry['username'].lower()
+                    
+                    if (name_lower in full_name) or (name_lower in username):
+                        filtered_leaderboard.append(entry)
+                
+                leaderboard = filtered_leaderboard
+            else:
+                leaderboard = complete_leaderboard[:10]
 
     except Exception as e:
         print("Error loading leaderboard:", e)
         return []
-    
 
-    leaderboard = [dict(row) for row in leaderboard]
-    return leaderboard
+    return [dict(row) for row in leaderboard]
+
+
+
+
 

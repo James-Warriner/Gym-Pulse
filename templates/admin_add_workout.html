@@ -1,0 +1,93 @@
+<div id="main">
+  {% extends "layout.html" %}
+  
+  {% block title %} Home {% endblock %}
+  
+  {% block main %}
+<div class="container mt-2">
+  <h2>
+    Edit Exercises
+  </h2>
+  <p>
+    Click to edit or <button class="btn btn-outline-primary btn-sm">add new</button>
+  </p>
+</div>
+
+<div>
+  <table class="table table-bordered table-responsive">
+    <th>
+      Name
+    </th>
+    <th>
+      Primary Muscle
+    </th>
+
+    <th>
+      Level
+    </th>
+
+    {% for exercise in exercises %}
+   <tr>
+      <td>
+        <button id="{{exercise.id}}" class="btn btn-outline-primary btn-sm">{{exercise.name}}</button>
+      </td>
+      <td>
+        {{exercise.m1name}}
+      </td>
+      <td>
+        {{exercise.level}}
+      </td>
+    </tr>
+    {% endfor %}
+
+  </table>
+</div>
+
+<script>
+  document.querySelectorAll(".btn.btn-outline-primary.btn-sm").forEach(button =>{
+    button.addEventListener('click', async function(){
+
+      let id = this.id
+      if (id == null){
+        id = "blank";
+      }
+
+      const res = await fetch("/admin_exercises", {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          action:"edit",
+          id:id
+        })
+      });
+      const data = await res.json();
+
+      if (data.message){
+        console.log("true");
+        const errorBar = document.getElementById("error-bar");
+        errorBar.innerText = data.message;
+        errorBar.classList.remove("d-none");
+      }
+      else{
+        const doc = document.getElementById("main");
+        const oldScripts = doc.querySelectorAll("script");
+      oldScripts.forEach(script => script.remove());
+        doc.innerHTML = data.html;
+        const scripts = doc.querySelectorAll("script");
+        scripts.forEach(script => {
+        const newScript = document.createElement("script");
+        newScript.text = script.textContent;
+        document.body.appendChild(newScript);
+});
+
+      }
+    })
+  })
+</script>
+  
+  {% endblock %}
+  </div>
+
+  

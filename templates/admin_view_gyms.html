@@ -1,0 +1,84 @@
+<div id="main">
+  {% extends "layout.html" %}
+  
+  {% block title %} Home {% endblock %}
+  
+  {% block main %}
+<div class="container mt-2">
+  <h2>
+    Edit Gyms
+  </h2>
+  <p>
+    Click to edit or <button class="btn btn-outline-primary btn-sm">add new</button>
+  </p>
+</div>
+
+<div>
+  <table class="table table-bordered table-responsive">
+    <th>
+      Name
+    </th>
+    <th>
+      Postcode
+    </th>
+
+
+    {% for gym in gyms %}
+   <tr>
+      <td>
+        <button id="{{gym.id}}" class="btn btn-outline-primary btn-sm">{{gym.name}}</button>
+      </td>
+      <td>
+        {{gym.location}}
+      </td>
+
+    </tr>
+    {% endfor %}
+
+  </table>
+</div>
+
+<script>
+  document.querySelectorAll(".btn.btn-outline-primary.btn-sm").forEach(button =>{
+    button.addEventListener('click', async function(){
+
+      let id = this.id
+      console.log(id)
+      if (id == null){
+        id = "blank";
+      }
+      
+      const res = await fetch("/admin_gyms", {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          action:"edit",
+          id:id
+        })
+      });
+      const data = await res.json();
+
+      if (data.message){
+        console.log("true");
+        const errorBar = document.getElementById("error-bar");
+        errorBar.innerText = data.message;
+        errorBar.classList.remove("d-none");
+      }
+      else{
+        const doc = document.getElementById("main");
+
+        doc.innerHTML = data.html;
+        const scripts = doc.querySelectorAll("script");
+  
+
+      }
+    })
+  })
+</script>
+  
+  {% endblock %}
+  </div>
+
+  

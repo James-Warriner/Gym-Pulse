@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from flask import jsonify
 import sqlite3
-from helpers import login_required, error, utc_to_local, loadUser, loadExercises,loadLeaderboard,get_db
+from helpers import login_required, error, utc_to_local, loadUser, loadExercises,loadLeaderboard,get_db,admin_required
 import pytz
 from zoneinfo import ZoneInfo
 from collections import defaultdict
@@ -100,6 +100,9 @@ def login():
       return error("Incorrect credentials",400)
     
     session["user_id"] = rows[0]["id"]
+    if int(rows[0]["is_admin"]) == 1:
+       session["is_admin"] = True
+    
 
     return jsonify({"redirect":"/"})
   
@@ -215,7 +218,7 @@ def workout():
         """, (user_id,)).fetchone()
 
         if not workout:
-            # No active workout, create a new one
+
             db.execute("""
                 INSERT INTO workouts (user_id, start_time) 
                 VALUES (?, datetime('now'))
@@ -238,8 +241,7 @@ def workout():
     data = request.get_json()
     workout_id = session.get("workout_id")
 
-    if not workout_id:
-        return jsonify({"error": "No active workout"}), 400
+
 
     action = data.get("action")
 
@@ -250,26 +252,60 @@ def workout():
         return jsonify({"success": True, "exercise_id": exercise_id})
 
     elif action == "save_set":
-        try:
-            db.execute("""
+        
+
+        rows = db.execute("SELECT id FROM sets WHERE set_number = ? AND workout_id = ? AND exercise_id = ?",(data["set_number"],session["workout_id"],request.get_json().get("exercise_id"))).fetchall()
+
+        print(len(rows))
+        if len(rows) > 0:
+          id = rows[0]["id"]
+          print("route1")
+          try:
+              print(data["notes"])
+              print(id)
+              print(session["workout_id"])
+              print("1")
+              db.execute("UPDATE sets SET reps = ?, weight = ?, notes = ? WHERE id = ?",(data["reps"],data["weight"],data["notes"],id,))
+
+              db.commit()
+
+              
+
+              
+              print("made it")
+
+              return jsonify({"success":"true"})
+
+          except Exception as e:
+             print(e)
+             return error(str(e),500)
+        
+        else:
+
+          print("2")
+                 
+          try:
+              db.execute("""
                 INSERT INTO sets (workout_id, exercise_id, set_number, reps, weight, notes)
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (
-                workout_id,
+                session["workout_id"],
                 data["exercise_id"],
                 data["set_number"],
                 data["reps"],
                 data["weight"],
-                data["notes"]
+                data["notes"],
             ))
-            db.commit()
-            return jsonify({"success": True})
-        except Exception as e:
-            return jsonify({"error": str(e)}), 400
+              db.commit()
 
+              return jsonify({"success": True})
+          except Exception as e:
+              return jsonify({"error": str(e)}), 400
+      
+         
     elif action == "finish":
         try:
-            
+            print("3")
             db.execute("""
                 UPDATE workouts SET end_time = datetime('now') WHERE id = ?
             """, (workout_id,))
@@ -279,6 +315,7 @@ def workout():
         except Exception as e:
             return jsonify({"error": str(e)}), 400
     elif action == "save_name":
+      print("4")
       name = request.get_json().get("name")
       try:
         db.execute("UPDATE workouts SET name = ? WHERE id = ?",(name,workout_id))
@@ -288,6 +325,7 @@ def workout():
        return jsonify({"error":str(e)}),400
     
     elif action == "get_name":
+      print("5")
       name = request.get_json().get("name")
       try:
         row = db.execute("SELECT name FROM workouts WHERE id = ?",(workout_id,)).fetchall()[0]
@@ -332,7 +370,7 @@ def searchExercises():
     query = request.form.get('query')
 
 
-    cursor = db.execute("SELECT name,id FROM exercises WHERE name LIKE ?", ('%' + query + '%',))
+    cursor = db.execute("SELECT e.name,e.id FROM exercises e LEFT JOIN muscles m1 ON m1.id = e.primary_muscles_id LEFT JOIN muscles m2 ON m2.id = e.secondary_muscles_id WHERE e.name LIKE ? OR m1.muscle_name LIKE ? OR m1.area LIKE ? OR m2.muscle_name LIKE ? OR m2.area LIKE ?", ('%' + query + '%','%' + query + '%','%' + query + '%','%' + query + '%','%' + query + '%'))
 
     rows = cursor.fetchall()
 
@@ -367,6 +405,7 @@ def delete():
 
         db.execute("DELETE FROM sets WHERE exercise_id = ? AND workout_id = ?",(exercise,id))
         db.commit()
+        
 
         return jsonify("Success")
 
@@ -475,7 +514,7 @@ def browse():
 
   if request.method == "GET":
 
-    users = db.execute("SELECT u.id,u.timestamp, u.username, u.gym_id, u.first_name, u.last_name, u.dob, COALESCE(SUM(w.duration_minutes), 0) AS total_duration, (SELECT e.name FROM sets s JOIN workouts w2 ON s.workout_id = w2.id JOIN exercises e ON s.exercise_id = e.id WHERE w2.user_id = u.id GROUP BY e.name ORDER BY COUNT(*) DESC LIMIT 1) AS most_used_exercise FROM users u LEFT JOIN workouts w ON w.user_id = u.id WHERE u.gym_id = ? GROUP BY u.id", (gym_id,)).fetchall()
+    users = db.execute("SELECT u.id,u.timestamp, u.username, u.gym_id, u.first_name, u.last_name, u.dob, COALESCE(SUM(w.duration_minutes), 0) AS total_duration, (SELECT e.name FROM sets s JOIN workouts w2 ON s.workout_id = w2.id JOIN exercises e ON s.exercise_id = e.id WHERE w2.user_id = u.id GROUP BY e.name ORDER BY COUNT(*) DESC LIMIT 1) AS most_used_exercise FROM users u LEFT JOIN workouts w ON w.user_id = u.id WHERE u.gym_id = ? GROUP BY u.id ORDER BY u.username ASC", (gym_id,)).fetchall()
 
 
    
@@ -489,14 +528,166 @@ def browse():
     print(userId)
     print(gym_id)
 
-    user = db.execute("SELECT u.id,u.timestamp, u.username, u.first_name, u.last_name, u.dob, COALESCE(SUM(w.duration_minutes), 0) AS total_duration, COUNT(w.id) AS count, (SELECT e.name FROM sets s JOIN workouts w2 ON s.workout_id = w2.id JOIN exercises e ON s.exercise_id = e.id WHERE w2.user_id = u.id GROUP BY e.name ORDER BY COUNT(*) DESC LIMIT 1) AS most_used_exercise, g.name AS gym_name FROM users u LEFT JOIN workouts w ON w.user_id = u.id LEFT JOIN gyms g ON g.id = u.gym_id WHERE u.id = ? AND u.gym_id = ? GROUP BY u.id", (userId, gym_id)).fetchall()[0]
+    user = db.execute("SELECT u.id,u.timestamp, u.username, u.first_name, u.last_name, u.dob, COALESCE(SUM(w.duration_minutes), 0) AS total_duration, COUNT(w.id) AS count, (SELECT e.name FROM sets s JOIN workouts w2 ON s.workout_id = w2.id JOIN exercises e ON s.exercise_id = e.id WHERE w2.user_id = u.id GROUP BY e.name ORDER BY COUNT(*) DESC LIMIT 1) AS most_used_exercise, g.name AS gym_name FROM users u LEFT JOIN workouts w ON w.user_id = u.id LEFT JOIN gyms g ON g.id = u.gym_id WHERE u.id = ? GROUP BY u.id", (userId)).fetchall()[0]
 
     print(dict(user))
     html_content = render_template("other_profiles.html", user=user)
     return jsonify({"html":html_content})
 
 
+@app.route("/delete_profile",methods=["POST","GET"])
+@login_required
+def delete_profile():
+   action = request.get_json().get("action")
 
+   if action == "delete":
+      db = get_db()
+
+      print("in if")
+
+      try:
+         db.execute("DELETE FROM users WHERE id = ?",(session["user_id"],))
+         db.commit()
+         db.execute("DELETE FROM workouts WHERE user_id = ?",(session["user_id"],))
+         db.commit()
+         db.execute("DELETE FROM sets WHERE workout_id NOT IN (SELECT DISTINCT id FROM workouts)")
+         db.commit()
+
+         print("in try")
+
+         return jsonify({"redirect":"/logout"})
+      except Exception as e:
+         print(str(e))
+         return jsonify({"message":str(e)})
+      
+
+@app.route("/admin", methods=["POST","GET"])
+@admin_required
+def admin():
+   if request.method == "GET":
+      return render_template("admin.html")
+   
+
+@app.route("/admin_exercises",methods=["GET","POST"])
+@admin_required
+def admin_exercises():
+   db = get_db()
+   def admin_load_exercises():
+    
+    exercises = db.execute("SELECT e.id, m2.muscle_name m2name,m2.id m2id, m1.muscle_name m1name,m1.id m1id, e.name, e.level, e.instructions FROM exercises e LEFT JOIN muscles m1 ON e.primary_muscles_id = m1.id LEFT JOIN muscles m2 ON e.secondary_muscles_id = m2.id ORDER BY e.name ASC").fetchall()
+
+    exercises = [dict(exercise) for exercise in exercises]
+    return exercises
+   
+   
+
+
+   if request.method == "GET":
+      session["edit_exercise_id"] = None
+      exercises = admin_load_exercises()
+      print(exercises)
+      return render_template("admin_add_workout.html", exercises = admin_load_exercises())
+   
+   elif request.content_type == "application/json":
+      muscles = db.execute("SELECT * FROM muscles").fetchall()
+      if request.get_json().get("id") != "":
+        print(request.get_json().get("id"))
+        session["edit_exercise_id"] = request.get_json().get("id")
+        exercise = db.execute("SELECT e.id,m2.muscle_name m2name, m2.id m2id, m1.muscle_name m1name,m1.id m1id, e.name, e.level, e.instructions FROM exercises e LEFT JOIN muscles m1 ON e.primary_muscles_id = m1.id LEFT JOIN muscles m2 ON e.secondary_muscles_id = m2.id WHERE e.id = ?",(request.get_json().get("id"),)).fetchall()[0]
+
+        
+        html = render_template("admin_edit_exercise.html", muscles = muscles, exercise = exercise)
+        print(dict(exercise))
+      else:
+         print("here")
+         html = render_template("admin_edit_exercise.html",muscles = muscles, exercise = [{}])
+      
+      return jsonify({"html":html})
+   
+   elif request.content_type == "application/x-www-form-urlencoded":
+      name = request.form.get("name")
+      primary = request.form.get("primary")
+      secondary = request.form.get("secondary")
+      level = request.form.get("level")
+      instructions = request.form.get("instructions")
+      id = session.get("edit_exercise_id")
+
+      if not name:
+         muscles = db.execute("SELECT * FROM muscles").fetchall()
+         return render_template("admin_edit_exercise.html", muscles = muscles, exercise = admin_load_exercises())
+      if not primary:
+         muscles = db.execute("SELECT * FROM muscles").fetchall()
+         return render_template("admin_edit_exercise.html", muscles = muscles, exercise = admin_load_exercises())
+      if not level:
+         muscles = db.execute("SELECT * FROM muscles").fetchall()
+         return render_template("admin_edit_exercise.html", muscles = muscles, exercise = admin_load_exercises())
+      if not instructions:
+         muscles = db.execute("SELECT * FROM muscles").fetchall()
+         return render_template("admin_edit_exercise.html", muscles = muscles, exercise = admin_load_exercises)
+      
+      if id:
+        
+        db.execute("UPDATE exercises SET name = ?, primary_muscles_id = ?, secondary_muscles_id = ?,level = ?, instructions = ? WHERE id = ?",(name,primary,secondary,level,instructions,id,))
+
+        
+      else:
+        db.execute("""
+                    INSERT INTO exercises (name, primary_muscles_id, secondary_muscles_id, level, instructions) 
+                    VALUES (?, ?, ?, ?, ?)
+                """, (name, primary, secondary, level, instructions))
+      
+      session["admin_edit_exercise"] = None
+      db.commit()
+
+      return render_template("admin_add_workout.html", exercises = admin_load_exercises())
+   
+
+@app.route("/admin_gyms",methods=["POST","GET"])
+@admin_required
+def admin_gym():
+   db = get_db()
+   def loadGyms():
+      gyms = db.execute("SELECT * FROM gyms").fetchall()
+      gyms = [dict(gym) for gym in gyms]
+      return gyms
+   
+   if request.method == "GET":
+      return render_template("admin_view_gyms.html", gyms = loadGyms())
+   
+   elif request.content_type == "application/json":
+      id = request.get_json().get("id")
+      if id:
+        session["admin_gym_id"] = id
+        gym = db.execute("SELECT * FROM gyms WHERE id = ?",(id,)).fetchall()[0]
+        html =  render_template("admin_edit_gyms.html",gym = gym)
+        
+      else:
+         session["admin_gym_id"] = None
+         html =  render_template("admin_edit_gyms.html",gym = [{}])
+      
+      return jsonify({"html":html})
+   
+   elif request.content_type == "application/x-www-form-urlencoded":
+      if session.get("admin_gym_id"):
+         print(session["admin_gym_id"])
+         db.execute("UPDATE gyms SET name = ?, location = ? WHERE ID = ?",(request.form.get("name"), request.form.get("location"),session["admin_gym_id"]))
+      
+      else:
+         db.execute("INSERT INTO gyms (name,location) VALUES (?,?)",(request.form.get("name"),request.form.get("location")))
+      db.commit()
+      print("yes")
+      return render_template("admin_view_gyms.html", gyms = loadGyms())
+      
+      
+   
+
+
+   
+
+      
+      
+
+   
 
      
 
