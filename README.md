@@ -2,6 +2,8 @@
 
 A workout tracker tht incoorporates healthy competition between users.
 
+Video demo: https://youtu.be/c6k1P9JwcfM
+
 ## Table of Contents
 
 - [Overview](#overview)
