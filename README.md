@@ -34,37 +34,35 @@ Additionally, helpers.py has reusable functions that load data such as: loadUser
 
 Helpers.py also has functions to load the database and convert timezones.
 
-### app.py
 
-app.py is where the magic really happens. Due to the minimal code (around 500 lines) I decided to keep the app's code in one file to save complexity.
 
-#### index - login required
+### index - login required
 
 index is the route that loads the dashboard page, calling loadUser(), loadExercises() and loadLeaderboard() with params "bench press" (this is the default filter for leaderboard). This is all rendered onto index.html using Jinja when the page is loaded. If a POST request is made, loadLeaderboard is simply called with the query passed to it.
 
-#### login
+### login
 
 The login route is simply a route that returns the login.html page upon load. When a user sends a completed login form, it checks for correct password and username or email. It will return an identical error to the frontend if username or password is incorrect to reduce brute force likelihood. If a user's password is correct, their id is set as session ID and if they are marked as an admin their session["is_admin"] is set to true.
 
-#### register
+### register
 
 Upon load, the register route returns register.html. This has a form containing: username ,first name, last name, email, date of birth, affiliated gym, password.
 
 As the username is typed, the frontend makes POST requests to register(), checking if the name is unique. If not, it returns an error not unique. Once the user completes their registration, checks take place to make sure all fields exist. If they do, all info is committed to users table.
 
-#### logout
+### logout
 
 Clears session cookies to remove the logged in user's access.
 
-#### workout - login required
+### workout - login required
 
 Arguably the main function as it provides the user the ability to add workouts.
 
-##### GET
+#### GET
 
 GET requests check if the user has a workout ongoing, if not a new workout session is created. The workout_id is then stored in the session. It then retrives all exercises and renders them to the frontend.
 
-##### POST
+#### POST
 add_exercise - Confirms selection of exercise
 
 save_set - Adds or updates a set for the current exercise in the workout
@@ -77,11 +75,11 @@ save_name - Saves the workouts new name retrived from frontend.
 
 I will split this into frontend and backend due to its complexity.
 
-##### Backend
+#### Backend
 
 Fetches sets and exercises that have the workout id passed to it. This returns a dictionary of all exercises/sets from the current workout to preserve data between saves/ reloads. 
 
-##### Frontend
+#### Frontend
 
 loadExistingSets() - Fetches and groups sets by exercise, creating blocks for each exercise.
 
@@ -113,6 +111,11 @@ Fetches all completed workouts for the logged in user, converts timestamps to lo
 delete - deletes the workout from the workouts table with id passed from frontend
 
 view - Retrives all sets and exercises that match the workout_id selected. These are then rendered with view_workout.html.
+
+### profile() - login required
+
+This function fetches the user's details and returns them to profile.html. Then, any POST requests such as changes to a password are updated in the database and reflected in the frontend again.
+
 
 
 
