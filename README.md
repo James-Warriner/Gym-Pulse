@@ -9,7 +9,7 @@ Video demo: https://youtu.be/c6k1P9JwcfM
 - [Overview](#overview)
 - [Features](#features)
 - [Installation](#installation)
--
+- [Code](#code)
 
 
 
@@ -23,6 +23,13 @@ This project was created to emphasise the social impact of fitness. I believe th
 - Gym-Based leaderboards
 - In depth workout tracker
 - Self managed exercises through admin portal
+
+## Code
+
+### helpers.py:
+
+Helpers.py is set up to manage login routes and enforce a user has a session id before acessing certain routes. Additionally, I added an admin_required function to also protect admin routes such as altering stored exercises.
+
 
 ## Installation
 
@@ -42,5 +49,7 @@ source venv/Scripts/Activate
 pip install -r requirements.txt
 
 pip run flask --debug
+
+
 
 
